@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Specimen Dispatch Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    label { display: block; margin-top: 16px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+    .toggle-group { display: flex; gap: 12px; margin-top: 8px; }
+    .button-row { margin-top: 24px; display: flex; gap: 12px; }
+    .primary-btn, .secondary-btn { padding: 10px 16px; cursor: pointer; }
+    .primary-btn { background-color: #0078D4; color: white; border: none; }
+    .secondary-btn { background-color: #f1f1f1; border: 1px solid #ccc; }
+    input[type="radio"]:disabled + label, label input[type="radio"]:disabled {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Specimen & Supply Dispatch</h1>
+
+  <!-- Request Type -->
+  <label>Request Type</label>
+  <div class="toggle-group">
+    <label><input type="radio" name="requestType" value="supply" checked> Supply Request</label>
+    <label><input type="radio" name="requestType" value="pickup"> Pickup</label>
+  </div>
+
+  <!-- Lockbox Fit -->
+  <label for="lockbox-fit">Do the supplies fit in the lockbox?</label>
+  <select id="lockbox-fit">
+    <option value="">Select</option>
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+
+  <!-- STAT Confirmation -->
+  <label>Is this a STAT?</label>
+  <div class="toggle-group" id="stat-group">
+    <label><input type="radio" name="isStat" value="yes"> Yes</label>
+    <label><input type="radio" name="isStat" value="no" checked> No</label>
+  </div>
+
+  <!-- Time back to lab -->
+  <label for="lab-return-time">What time does it need to be back to the lab?</label>
+  <input type="time" id="lab-return-time" />
+
+  <!-- Earliest pickup -->
+  <label for="earliest-pickup">What's the earliest this can be picked up?</label>
+  <input type="time" id="earliest-pickup" />
+
+  <!-- Building lock -->
+  <label>Does the building lock?</label>
+  <div class="toggle-group">
+    <label><input type="radio" name="buildingLock" value="yes"> Yes</label>
+    <label><input type="radio" name="buildingLock" value="no" checked> No</label>
+  </div>
+
+  <!-- Frozen specimen -->
+  <label>Is this a frozen specimen?</label>
+  <div class="toggle-group">
+    <label><input type="radio" name="isFrozen" value="yes"> Yes</label>
+    <label><input type="radio" name="isFrozen" value="no" checked> No</label>
+  </div>
+
+  <!-- Buttons -->
+  <div class="button-row">
+    <button type="submit" class="primary-btn">Submit Task</button>
+    <button type="reset" class="secondary-btn">Reset Form</button>
+  </div>
+
+  <!-- Auto-STAT Script -->
+  <script>
+    const lockboxSelect = document.getElementById("lockbox-fit");
+    const statInputs = document.querySelectorAll('input[name="isStat"]');
+
+    lockboxSelect.addEventListener("change", function () {
+      const isNo = this.value === "no";
+
+      // Auto-select STAT = Yes
+      document.querySelector('input[name="isStat"][value="yes"]').checked = true;
+
+      // Disable STAT radio buttons if "No" selected
+      statInputs.forEach(input => {
+        input.disabled = isNo;
+      });
+
+      // If "Yes" selected again, enable back the radio buttons
+      if (!isNo) {
+        statInputs.forEach(input => {
+          input.disabled = false;
+        });
+      }
+    });
+  </script>
+</body>
+</html>
