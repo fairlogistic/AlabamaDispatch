@@ -68,6 +68,12 @@
           <label><input type="radio" name="buildingLock" value="no" checked> No</label>
         </div>
 
+        <!-- Time Building Locks (Initially Hidden) -->
+        <div id="lock-time-group" style="display: none;">
+          <label for="lock-time">What time does it lock?</label>
+          <input type="time" id="lock-time" />
+        </div>
+
         <!-- Frozen specimen -->
         <label>Is this a frozen specimen?</label>
         <div class="toggle-group">
@@ -109,51 +115,36 @@
         const locationList = document.getElementById("location-list");
 
         lines.slice(1).forEach(row => {
-          const [name, address] = row.split(",");
+          const [name, ...rest] = row.split(",");
+          const address = rest.join(",").replace(/^"|"$/g, "").trim();
           if (name && address) {
             const option = document.createElement("option");
             option.value = name.trim();
             locationList.appendChild(option);
-            locationMap[name.trim()] = address.trim();
+            locationMap[name.trim()] = address;
           }
         });
       });
-
-
-    document.getElementById("preview-btn").addEventListener("click", function () {
-      const payload = {
-        location: document.getElementById("location").value,
-        address: document.getElementById("location-address").value,
-        requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
-        lockboxFit: document.getElementById("lockbox-fit").value,
-        isStat: document.querySelector('input[name="isStat"]:checked')?.value || "",
-        labReturnTime: document.getElementById("lab-return-time").value,
-        earliestPickup: document.getElementById("earliest-pickup").value,
-        buildingLock: document.querySelector('input[name="buildingLock"]:checked')?.value || "",
-        isFrozen: document.querySelector('input[name="isFrozen"]:checked')?.value || ""
-      };
-
-      const formatted = `
-    Location: ${payload.location}
-    Address: ${payload.address}
-    Request Type: ${payload.requestType}
-    Lockbox Fit: ${payload.lockboxFit}
-    STAT: ${payload.isStat}
-    Return Time: ${payload.labReturnTime}
-    Earliest Pickup: ${payload.earliestPickup}
-    Building Locks: ${payload.buildingLock}
-    Frozen Specimen: ${payload.isFrozen}
-      `;
-
-      alert("Preview:\n\n" + formatted);
-    });
-
 
     // Show address when location is selected
     document.getElementById("location").addEventListener("input", function () {
       const selected = this.value.trim();
       const addrInput = document.getElementById("location-address");
       addrInput.value = locationMap[selected] || "";
+    });
+
+    // Show/hide lock time field
+    const buildingLockInputs = document.querySelectorAll('input[name="buildingLock"]');
+    const lockTimeGroup = document.getElementById("lock-time-group");
+
+    buildingLockInputs.forEach(input => {
+      input.addEventListener("change", () => {
+        if (input.value === "yes" && input.checked) {
+          lockTimeGroup.style.display = "block";
+        } else if (input.value === "no" && input.checked) {
+          lockTimeGroup.style.display = "none";
+        }
+      });
     });
 
     // Clear read-only field on form reset
@@ -163,6 +154,40 @@
         input.disabled = false;
         input.checked = input.value === "no";
       });
+      lockTimeGroup.style.display = "none";
+    });
+
+    // Preview modal
+    document.getElementById("preview-btn").addEventListener("click", function () {
+      const payload = {
+        location: document.getElementById("location").value,
+        address: document.getElementById("location-address").value,
+        requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
+        lockboxFit: document.getElementById("lockbox-fit").value,
+        isStat: document.querySelector('input[name="isStat"]:checked')?.value || "",
+        labReturnTime: document.getElementById("lab-return-time").value,
+        earliestPickup: document.getElementById("earliest-pickup").value,
+        latestPickup: document.getElementById("latest-pickup").value,
+        buildingLock: document.querySelector('input[name="buildingLock"]:checked')?.value || "",
+        lockTime: document.getElementById("lock-time").value || "",
+        isFrozen: document.querySelector('input[name="isFrozen"]:checked')?.value || ""
+      };
+
+      const formatted = `
+Location: ${payload.location}
+Address: ${payload.address}
+Request Type: ${payload.requestType}
+Lockbox Fit: ${payload.lockboxFit}
+STAT: ${payload.isStat}
+Return Time: ${payload.labReturnTime}
+Earliest Pickup: ${payload.earliestPickup}
+Latest Pickup: ${payload.latestPickup}
+Building Locks: ${payload.buildingLock}
+Lock Time: ${payload.lockTime}
+Frozen Specimen: ${payload.isFrozen}
+      `;
+
+      alert("Preview:\n\n" + formatted);
     });
   </script>
 </body>
