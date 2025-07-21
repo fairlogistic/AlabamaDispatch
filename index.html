@@ -65,9 +65,11 @@
           <label><input type="radio" name="buildingLock" value="no" checked> No</label>
         </div>
 
-        <!-- Time Building Locks (Always Visible, Disabled by Default) -->
-        <label for="lock-time">What time does it lock?</label>
-        <input type="time" id="lock-time" disabled />
+        <!-- Time Building Locks (Initially Hidden) -->
+        <div id="lock-time-group" style="display: none;">
+          <label for="lock-time">What time does it lock?</label>
+          <input type="time" id="lock-time" />
+        </div>
 
         <!-- Frozen specimen -->
         <label>Is this a frozen specimen?</label>
@@ -128,30 +130,28 @@
       addrInput.value = locationMap[selected] || "";
     });
 
-    // Enable or disable "What time does it lock?" input
+    // Show/hide lock time field
     const buildingLockInputs = document.querySelectorAll('input[name="buildingLock"]');
-    const lockTimeInput = document.getElementById("lock-time");
+    const lockTimeGroup = document.getElementById("lock-time-group");
 
     buildingLockInputs.forEach(input => {
       input.addEventListener("change", () => {
         if (input.value === "yes" && input.checked) {
-          lockTimeInput.disabled = false;
+          lockTimeGroup.style.display = "block";
         } else if (input.value === "no" && input.checked) {
-          lockTimeInput.disabled = true;
-          lockTimeInput.value = "";
+          lockTimeGroup.style.display = "none";
         }
       });
     });
 
-    // Clear on form reset
+    // Clear read-only field on form reset
     document.getElementById("trip-request-form").addEventListener("reset", function () {
       document.getElementById("location-address").value = "";
       statInputs.forEach(input => {
         input.disabled = false;
         input.checked = input.value === "no";
       });
-      lockTimeInput.disabled = true;
-      lockTimeInput.value = "";
+      lockTimeGroup.style.display = "none";
     });
 
     // Preview modal
