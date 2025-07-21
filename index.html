@@ -3,118 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fair Trip Request</title>
-  <link rel="icon" type="image/png" href="image/icon.png">
+  <title>Fair Trip Request-AL</title>
+  <link rel="icon" type="image/png" href="icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <div class="background-wrapper">
+    <div class="container">
+      <form id="trip-request-form">
+        <div class="header">
+          <img src="logo2.png" alt="Fair Logistics Logo" class="logo-centered">
+        </div>
 
-<div class="header">
-  <img src="fair.png" alt="Fair Logistics Logo" class="logo">
-</div>
+        <h1>Trip Request - Alabama</h1>
 
-<h1>Trip Request</h1>
+        <!-- Location Selection -->
+        <label for="location">Location</label>
+        <input type="text" id="location" list="location-list" placeholder="Start typing location name..." />
+        <datalist id="location-list"></datalist>
 
-<!-- Location Selection -->
-<label for="location">Location</label>
-<input type="text" id="location" list="location-list" placeholder="Start typing location name..." />
-<datalist id="location-list"></datalist>
+        <!-- Address Display -->
+        <label for="location-address">Address</label>
+        <input type="text" id="location-address" readonly placeholder="Address will appear here..." />
 
-<!-- Address Display -->
-<label for="location-address">Address</label>
-<input type="text" id="location-address" readonly placeholder="Address will appear here..." />
+        <!-- Request Type -->
+        <label>Request Type</label>
+        <div class="toggle-group">
+          <label><input type="radio" name="requestType" value="supply" checked> Supply Request</label>
+          <label><input type="radio" name="requestType" value="pickup"> Pickup</label>
+        </div>
 
-<!-- Request Type -->
-<label>Request Type</label>
-<div class="toggle-group">
-  <label><input type="radio" name="requestType" value="supply" checked> Supply Request</label>
-  <label><input type="radio" name="requestType" value="pickup"> Pickup</label>
-</div>
+        <!-- Lockbox Fit -->
+        <label for="lockbox-fit">Do the supplies fit in the lockbox?</label>
+        <select id="lockbox-fit">
+          <option value="">Select</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
 
-<!-- Lockbox Fit -->
-<label for="lockbox-fit">Do the supplies fit in the lockbox?</label>
-<select id="lockbox-fit">
-  <option value="">Select</option>
-  <option value="yes">Yes</option>
-  <option value="no">No</option>
-</select>
+        <!-- STAT Confirmation -->
+        <label>Is this a STAT?</label>
+        <div class="toggle-group" id="stat-group">
+          <label><input type="radio" name="isStat" value="yes"> Yes</label>
+          <label><input type="radio" name="isStat" value="no" checked> No</label>
+        </div>
 
-<!-- STAT Confirmation -->
-<label>Is this a STAT?</label>
-<div class="toggle-group" id="stat-group">
-  <label><input type="radio" name="isStat" value="yes"> Yes</label>
-  <label><input type="radio" name="isStat" value="no" checked> No</label>
-</div>
+        <!-- Time back to lab -->
+        <label for="lab-return-time">When does it need to be back to the lab?</label>
+        <input type="datetime-local" id="lab-return-time" />
 
-<!-- Time back to lab -->
-<label for="lab-return-time">When does it need to be back to the lab?</label>
-<input type="datetime-local" id="lab-return-time" />
+        <!-- Earliest pickup -->
+        <label for="earliest-pickup">When is the earliest it can be picked up?</label>
+        <input type="datetime-local" id="earliest-pickup" />
 
-<!-- Earliest pickup -->
-<label for="earliest-pickup">When is the earliest it can be picked up?</label>
-<input type="datetime-local" id="earliest-pickup" />
+        <!-- Building lock -->
+        <label>Does the building lock?</label>
+        <div class="toggle-group">
+          <label><input type="radio" name="buildingLock" value="yes"> Yes</label>
+          <label><input type="radio" name="buildingLock" value="no" checked> No</label>
+        </div>
 
-<!-- Building lock -->
-<label>Does the building lock?</label>
-<div class="toggle-group">
-  <label><input type="radio" name="buildingLock" value="yes"> Yes</label>
-  <label><input type="radio" name="buildingLock" value="no" checked> No</label>
-</div>
+        <!-- Frozen specimen -->
+        <label>Is this a frozen specimen?</label>
+        <div class="toggle-group">
+          <label><input type="radio" name="isFrozen" value="yes"> Yes</label>
+          <label><input type="radio" name="isFrozen" value="no" checked> No</label>
+        </div>
 
-<!-- Frozen specimen -->
-<label>Is this a frozen specimen?</label>
-<div class="toggle-group">
-  <label><input type="radio" name="isFrozen" value="yes"> Yes</label>
-  <label><input type="radio" name="isFrozen" value="no" checked> No</label>
-</div>
+        <!-- Buttons -->
+        <div class="button-row">
+          <button type="submit" class="primary-btn">Submit Task</button>
+          <button type="button" class="secondary-btn" id="preview-btn">Preview</button>
+          <button type="reset" class="secondary-btn">Reset Form</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-<!-- Buttons -->
-<div class="button-row">
-  <button type="submit" class="primary-btn">Submit Task</button>
-  <button type="reset" class="secondary-btn">Reset Form</button>
-</div>
+  <!-- Script -->
+  <script>
+    // Auto-select STAT if lockbox = No
+    const lockboxSelect = document.getElementById("lockbox-fit");
+    const statInputs = document.querySelectorAll('input[name="isStat"]');
 
-<!-- Script -->
-<script>
-  // Auto-select STAT if lockbox = No
-  const lockboxSelect = document.getElementById("lockbox-fit");
-  const statInputs = document.querySelectorAll('input[name="isStat"]');
-
-  lockboxSelect.addEventListener("change", function () {
-    const isNo = this.value === "no";
-    document.querySelector('input[name="isStat"][value="yes"]').checked = true;
-    statInputs.forEach(input => { input.disabled = isNo; });
-    if (!isNo) statInputs.forEach(input => { input.disabled = false; });
-  });
-
-  // Load CSV for Location Dropdown
-  const csvUrl = "https://raw.githubusercontent.com/fairlogistic/AlabamaDispatch/main/alabama_locations.csv";
-  const locationMap = {};
-
-  fetch(csvUrl)
-    .then(response => response.text())
-    .then(data => {
-      const lines = data.split("\n").map(line => line.trim()).filter(line => line);
-      const locationList = document.getElementById("location-list");
-
-      lines.slice(1).forEach(row => {
-        const [name, address] = row.split(",");
-        if (name && address) {
-          const option = document.createElement("option");
-          option.value = name.trim();
-          locationList.appendChild(option);
-          locationMap[name.trim()] = address.trim();
-        }
-      });
+    lockboxSelect.addEventListener("change", function () {
+      const isNo = this.value === "no";
+      document.querySelector('input[name="isStat"][value="yes"]').checked = true;
+      statInputs.forEach(input => { input.disabled = isNo; });
+      if (!isNo) statInputs.forEach(input => { input.disabled = false; });
     });
 
-  // Show address when location is selected
-  document.getElementById("location").addEventListener("input", function () {
-    const selected = this.value.trim();
-    const addrInput = document.getElementById("location-address");
-    addrInput.value = locationMap[selected] || "";
-  });
-</script>
+    // Load CSV for Location Dropdown
+    const csvUrl = "https://raw.githubusercontent.com/fairlogistic/AlabamaDispatch/main/alabama_locations.csv";
+    const locationMap = {};
 
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(data => {
+        const lines = data.split("\n").map(line => line.trim()).filter(line => line);
+        const locationList = document.getElementById("location-list");
+
+        lines.slice(1).forEach(row => {
+          const [name, address] = row.split(",");
+          if (name && address) {
+            const option = document.createElement("option");
+            option.value = name.trim();
+            locationList.appendChild(option);
+            locationMap[name.trim()] = address.trim();
+          }
+        });
+      });
+
+
+    document.getElementById("preview-btn").addEventListener("click", function () {
+      const payload = {
+        location: document.getElementById("location").value,
+        address: document.getElementById("location-address").value,
+        requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
+        lockboxFit: document.getElementById("lockbox-fit").value,
+        isStat: document.querySelector('input[name="isStat"]:checked')?.value || "",
+        labReturnTime: document.getElementById("lab-return-time").value,
+        earliestPickup: document.getElementById("earliest-pickup").value,
+        buildingLock: document.querySelector('input[name="buildingLock"]:checked')?.value || "",
+        isFrozen: document.querySelector('input[name="isFrozen"]:checked')?.value || ""
+      };
+
+      const formatted = `
+    Location: ${payload.location}
+    Address: ${payload.address}
+    Request Type: ${payload.requestType}
+    Lockbox Fit: ${payload.lockboxFit}
+    STAT: ${payload.isStat}
+    Return Time: ${payload.labReturnTime}
+    Earliest Pickup: ${payload.earliestPickup}
+    Building Locks: ${payload.buildingLock}
+    Frozen Specimen: ${payload.isFrozen}
+      `;
+
+      alert("Preview:\n\n" + formatted);
+    });
+
+
+    // Show address when location is selected
+    document.getElementById("location").addEventListener("input", function () {
+      const selected = this.value.trim();
+      const addrInput = document.getElementById("location-address");
+      addrInput.value = locationMap[selected] || "";
+    });
+
+    // Clear read-only field on form reset
+    document.getElementById("trip-request-form").addEventListener("reset", function () {
+      document.getElementById("location-address").value = "";
+      statInputs.forEach(input => {
+        input.disabled = false;
+        input.checked = input.value === "no";
+      });
+    });
+  </script>
 </body>
 </html>

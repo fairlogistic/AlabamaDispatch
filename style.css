@@ -1,24 +1,23 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 40px auto;
-    padding: 20px;
-    max-width: 900px;
-    background-color: #f0f4f8;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 40px 0; /* vertical breathing room */
+  min-height: 100vh;
+  background: linear-gradient(to right, #d4f1f4, #e7fbe7);
 }
+
+
 
 .header {
-  position: relative;
+  text-align: center;
   margin-bottom: 30px;
-  height: 60px;
 }
 
-.logo {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.logo-centered {
   height: 40px;
+  display: inline-block;
 }
+
 
 .app-title {
   text-align: center;
@@ -30,10 +29,13 @@ body {
 }
 
 .container {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 760px; /* not too narrow, not too wide */
+  margin: 0 auto;    /* center horizontally */
+  background-color: #ffffff;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
