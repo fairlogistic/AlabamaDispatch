@@ -34,24 +34,22 @@
           <label><input type="radio" name="requestType" value="pickup"> Pickup</label>
         </div>
 
-          <!-- STAT Confirmation -->
+        <!-- STAT Confirmation -->
         <label>Is this a STAT?</label>
         <div class="toggle-group" id="stat-group">
           <label><input type="radio" name="isStat" value="yes"> Yes</label>
           <label><input type="radio" name="isStat" value="no" checked> No</label>
         </div>
 
-      
         <!-- Lockbox Fit (conditionally visible) -->
-<div id="lockbox-group">
-  <label for="lockbox-fit">Do the supplies fit in the lockbox?</label>
-  <select id="lockbox-fit">
-    <option value="">Select</option>
-    <option value="yes">Yes</option>
-    <option value="no">No</option>
-  </select>
-</div>
-
+        <div id="lockbox-group">
+          <label for="lockbox-fit">Do the supplies fit in the lockbox?</label>
+          <select id="lockbox-fit">
+            <option value="">Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
 
         <!-- Time back to lab (conditionally visible) -->
         <div id="lab-return-group" style="display: none;">
@@ -62,7 +60,6 @@
         <!-- Earliest pickup -->
         <label for="earliest-pickup">When is the earliest it can be picked up?</label>
         <input type="datetime-local" id="earliest-pickup" />
-
 
         <!-- Building lock -->
         <label>Does the building lock?</label>
@@ -106,6 +103,7 @@
       statInputs.forEach(input => { input.disabled = isNo; });
       if (!isNo) statInputs.forEach(input => { input.disabled = false; });
       updateLabReturnVisibility();
+      updateLockboxVisibility();
     });
 
     // Load CSV for Location Dropdown
@@ -156,6 +154,7 @@
     const requestTypeInputs = document.querySelectorAll('input[name="requestType"]');
     const statInputsAll = document.querySelectorAll('input[name="isStat"]');
     const labReturnGroup = document.getElementById("lab-return-group");
+    const lockboxGroup = document.getElementById("lockbox-group");
 
     function updateLabReturnVisibility() {
       const isPickup = document.querySelector('input[name="requestType"]:checked')?.value === "pickup";
@@ -163,8 +162,21 @@
       labReturnGroup.style.display = (isPickup && isStat) ? "block" : "none";
     }
 
-    requestTypeInputs.forEach(input => input.addEventListener("change", updateLabReturnVisibility));
-    statInputsAll.forEach(input => input.addEventListener("change", updateLabReturnVisibility));
+    function updateLockboxVisibility() {
+      const isPickup = document.querySelector('input[name="requestType"]:checked')?.value === "pickup";
+      const isStatYes = document.querySelector('input[name="isStat"]:checked')?.value === "yes";
+      lockboxGroup.style.display = (isPickup || isStatYes) ? "none" : "block";
+    }
+
+    requestTypeInputs.forEach(input => input.addEventListener("change", () => {
+      updateLabReturnVisibility();
+      updateLockboxVisibility();
+    }));
+
+    statInputsAll.forEach(input => input.addEventListener("change", () => {
+      updateLabReturnVisibility();
+      updateLockboxVisibility();
+    }));
 
     // Clear on form reset
     document.getElementById("trip-request-form").addEventListener("reset", function () {
@@ -173,9 +185,10 @@
         input.disabled = false;
         input.checked = input.value === "no";
       });
-      lockTimeInput.disabled = true;
-      lockTimeInput.value = "";
+      lockTimeGroup.style.display = "none";
+      document.getElementById("lock-time").value = "";
       labReturnGroup.style.display = "none";
+      lockboxGroup.style.display = "block";
     });
 
     // Preview modal
