@@ -34,6 +34,13 @@
           <label><input type="radio" name="requestType" value="pickup"> Pickup</label>
         </div>
 
+          <!-- STAT Confirmation -->
+        <label>Is this a STAT?</label>
+        <div class="toggle-group" id="stat-group">
+          <label><input type="radio" name="isStat" value="yes"> Yes</label>
+          <label><input type="radio" name="isStat" value="no" checked> No</label>
+        </div>
+
         <!-- Lockbox Fit -->
         <label for="lockbox-fit">Do the supplies fit in the lockbox?</label>
         <select id="lockbox-fit">
@@ -42,12 +49,6 @@
           <option value="no">No</option>
         </select>
 
-        <!-- STAT Confirmation -->
-        <label>Is this a STAT?</label>
-        <div class="toggle-group" id="stat-group">
-          <label><input type="radio" name="isStat" value="yes"> Yes</label>
-          <label><input type="radio" name="isStat" value="no" checked> No</label>
-        </div>
 
         <!-- Time back to lab (conditionally visible) -->
         <div id="lab-return-group" style="display: none;">
