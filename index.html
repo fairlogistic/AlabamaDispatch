@@ -49,14 +49,19 @@
           <label><input type="radio" name="isStat" value="no" checked> No</label>
         </div>
 
-        <!-- Time back to lab -->
-        <label for="lab-return-time">When does it need to be back to the lab?</label>
-        <input type="datetime-local" id="lab-return-time" />
+        <!-- Time back to lab (conditionally visible) -->
+        <div id="lab-return-group" style="display: none;">
+          <label for="lab-return-time">When does it need to be back to the lab?</label>
+          <input type="datetime-local" id="lab-return-time" />
+        </div>
 
         <!-- Earliest pickup -->
         <label for="earliest-pickup">When is the earliest it can be picked up?</label>
         <input type="datetime-local" id="earliest-pickup" />
 
+        <!-- Latest pickup -->
+        <label for="latest-pickup">When is the latest it can be picked up?</label>
+        <input type="datetime-local" id="latest-pickup" />
 
         <!-- Building lock -->
         <label>Does the building lock?</label>
@@ -65,11 +70,9 @@
           <label><input type="radio" name="buildingLock" value="no" checked> No</label>
         </div>
 
-        <!-- Time Building Locks (Initially Hidden) -->
-        <div id="lock-time-group" style="display: none;">
-          <label for="lock-time">What time does it lock?</label>
-          <input type="time" id="lock-time" />
-        </div>
+        <!-- Time Building Locks (Always Visible, Disabled by Default) -->
+        <label for="lock-time">What time does it lock?</label>
+        <input type="time" id="lock-time" disabled />
 
         <!-- Frozen specimen -->
         <label>Is this a frozen specimen?</label>
@@ -99,6 +102,7 @@
       document.querySelector('input[name="isStat"][value="yes"]').checked = true;
       statInputs.forEach(input => { input.disabled = isNo; });
       if (!isNo) statInputs.forEach(input => { input.disabled = false; });
+      updateLabReturnVisibility();
     });
 
     // Load CSV for Location Dropdown
@@ -130,28 +134,45 @@
       addrInput.value = locationMap[selected] || "";
     });
 
-    // Show/hide lock time field
+    // Enable or disable "What time does it lock?" input
     const buildingLockInputs = document.querySelectorAll('input[name="buildingLock"]');
-    const lockTimeGroup = document.getElementById("lock-time-group");
+    const lockTimeInput = document.getElementById("lock-time");
 
     buildingLockInputs.forEach(input => {
       input.addEventListener("change", () => {
         if (input.value === "yes" && input.checked) {
-          lockTimeGroup.style.display = "block";
+          lockTimeInput.disabled = false;
         } else if (input.value === "no" && input.checked) {
-          lockTimeGroup.style.display = "none";
+          lockTimeInput.disabled = true;
+          lockTimeInput.value = "";
         }
       });
     });
 
-    // Clear read-only field on form reset
+    // Show/hide lab return time based on Pickup + STAT
+    const requestTypeInputs = document.querySelectorAll('input[name="requestType"]');
+    const statInputsAll = document.querySelectorAll('input[name="isStat"]');
+    const labReturnGroup = document.getElementById("lab-return-group");
+
+    function updateLabReturnVisibility() {
+      const isPickup = document.querySelector('input[name="requestType"]:checked')?.value === "pickup";
+      const isStat = document.querySelector('input[name="isStat"]:checked')?.value === "yes";
+      labReturnGroup.style.display = (isPickup && isStat) ? "block" : "none";
+    }
+
+    requestTypeInputs.forEach(input => input.addEventListener("change", updateLabReturnVisibility));
+    statInputsAll.forEach(input => input.addEventListener("change", updateLabReturnVisibility));
+
+    // Clear on form reset
     document.getElementById("trip-request-form").addEventListener("reset", function () {
       document.getElementById("location-address").value = "";
       statInputs.forEach(input => {
         input.disabled = false;
         input.checked = input.value === "no";
       });
-      lockTimeGroup.style.display = "none";
+      lockTimeInput.disabled = true;
+      lockTimeInput.value = "";
+      labReturnGroup.style.display = "none";
     });
 
     // Preview modal
