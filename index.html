@@ -250,7 +250,7 @@ document.getElementById("trip-request-form").addEventListener("submit", function
     tripNotes: document.getElementById("trip-notes").value.trim()
   };
 
-  fetch("https://dispatch.azurewebsites.net/api/sendEmailTripRequest?code=c9y3y8XsD7D7rTBDj260c6aK-oDnALvTO8qIjlh8JIKiAzFu2Poycg==", {
+  fetch("https://dispatch.azurewebsites.net/api/sendEmailRequest", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
