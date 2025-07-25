@@ -81,6 +81,12 @@
           <label><input type="radio" name="isFrozen" value="no" checked> No</label>
         </div>
 
+
+        <!-- Trip Notes -->
+        <label for="trip-notes">Trip Notes</label>
+        <textarea id="trip-notes" rows="3" placeholder="Additional details or instructions..."></textarea>
+
+
         <!-- Buttons -->
         <div class="button-row">
           <button type="submit" class="primary-btn">Submit Task</button>
@@ -191,23 +197,22 @@
       lockboxGroup.style.display = "block";
     });
 
-    // Preview modal
-    document.getElementById("preview-btn").addEventListener("click", function () {
-      const payload = {
-        location: document.getElementById("location").value,
-        address: document.getElementById("location-address").value,
-        requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
-        lockboxFit: document.getElementById("lockbox-fit").value,
-        isStat: document.querySelector('input[name="isStat"]:checked')?.value || "",
-        labReturnTime: document.getElementById("lab-return-time").value,
-        earliestPickup: document.getElementById("earliest-pickup").value,
-        latestPickup: document.getElementById("latest-pickup").value,
-        buildingLock: document.querySelector('input[name="buildingLock"]:checked')?.value || "",
-        lockTime: document.getElementById("lock-time").value || "",
-        isFrozen: document.querySelector('input[name="isFrozen"]:checked')?.value || ""
-      };
+ document.getElementById("preview-btn").addEventListener("click", function () {
+    const payload = {
+      location: document.getElementById("location").value,
+      address: document.getElementById("location-address").value,
+      requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
+      lockboxFit: document.getElementById("lockbox-fit").value,
+      isStat: document.querySelector('input[name="isStat"]:checked')?.value || "",
+      labReturnTime: document.getElementById("lab-return-time").value,
+      earliestPickup: document.getElementById("earliest-pickup").value,
+      buildingLock: document.querySelector('input[name="buildingLock"]:checked')?.value || "",
+      lockTime: document.getElementById("lock-time").value || "",
+      isFrozen: document.querySelector('input[name="isFrozen"]:checked')?.value || "",
+      tripNotes: document.getElementById("trip-notes").value.trim()
+    };
 
-      const formatted = `
+    const formatted = `
 Location: ${payload.location}
 Address: ${payload.address}
 Request Type: ${payload.requestType}
@@ -215,14 +220,62 @@ Lockbox Fit: ${payload.lockboxFit}
 STAT: ${payload.isStat}
 Return Time: ${payload.labReturnTime}
 Earliest Pickup: ${payload.earliestPickup}
-Latest Pickup: ${payload.latestPickup}
 Building Locks: ${payload.buildingLock}
 Lock Time: ${payload.lockTime}
 Frozen Specimen: ${payload.isFrozen}
-      `;
+Trip Notes: ${payload.tripNotes}
+    `;
 
-      alert("Preview:\n\n" + formatted);
-    });
-  </script>
+    alert("Preview:\n\n" + formatted);
+  });
+
+document.getElementById("trip-request-form").addEventListener("submit", function (e) {
+  e.preventDefault(); // Prevent default form behavior
+
+  const submitBtn = document.querySelector('.primary-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+
+  const payload = {
+    location: document.getElementById("location").value,
+    address: document.getElementById("location-address").value,
+    requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
+    lockboxFit: document.getElementById("lockbox-fit").value,
+    isStat: document.querySelector('input[name="isStat"]:checked')?.value || "",
+    labReturnTime: document.getElementById("lab-return-time").value,
+    earliestPickup: document.getElementById("earliest-pickup").value,
+    buildingLock: document.querySelector('input[name="buildingLock"]:checked')?.value || "",
+    lockTime: document.getElementById("lock-time").value || "",
+    isFrozen: document.querySelector('input[name="isFrozen"]:checked')?.value || "",
+    tripNotes: document.getElementById("trip-notes").value.trim()
+  };
+
+  fetch("https://dispatch.azurewebsites.net/api/sendEmailTripRequest?code=c9y3y8XsD7D7rTBDj260c6aK-oDnALvTO8qIjlh8JIKiAzFu2Poycg==", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Task";
+
+    if (response.ok) {
+      alert("Trip request submitted successfully!");
+      document.getElementById("trip-request-form").reset();
+    } else {
+      return response.text().then(text => { throw new Error(text); });
+    }
+  })
+  .catch(error => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Task";
+    alert("Failed to submit request:\n\n" + error.message);
+    console.error("Error:", error);
+  });
+});
+
+</script>
 </body>
 </html>
