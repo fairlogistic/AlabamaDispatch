@@ -18,6 +18,29 @@
 
         <h1>Trip Request - Alabama</h1>
 
+        <!-- Recipient Contact (Name + Phone Auto-Populate) -->
+        <div class="flex-row">
+          <div class="flex-item">
+            <label for="recipient-name">Recipient Name</label>
+            <select id="recipient-name">
+              <option value="">Select recipient</option>
+              <option value="Erin Ortman">Erin Ortman</option>
+              <option value="David Hattaway">David Hattaway</option>
+              <option value="Austin Wiggins">Austin Wiggins</option>
+              <option value="Katie Reaves">Katie Reaves</option>
+              <option value="Katie McIntyre">Katie McIntyre</option>
+              <option value="Joanne Guatney">Joanne Guatney</option>
+              <option value="Jamey Vella">Jamey Vella</option>
+            </select>
+          </div>
+
+          <div class="flex-item">
+            <label for="recipient-phone">Phone Number</label>
+            <input type="text" id="recipient-phone" readonly placeholder="Phone number will appear..." />
+          </div>
+        </div>
+
+
         <!-- Location Selection -->
         <label for="location">Location</label>
         <input type="text" id="location" list="location-list" placeholder="Start typing location name..." />
@@ -116,6 +139,23 @@
     const csvUrl = "https://raw.githubusercontent.com/fairlogistic/AlabamaDispatch/main/alabama_locations.csv";
     const locationMap = {};
 
+    // Recipient phone auto-fill based on selected name
+    const recipientPhoneMap = {
+      "Erin Ortman": "256-520-1785",
+      "David Hattaway": "256-337-0973",
+      "Austin Wiggins": "205-941-7826",
+      "Katie Reaves": "205-746-1770",
+      "Katie McIntyre": "334-782-7567",
+      "Joanne Guatney": "334-201-3448",
+      "Jamey Vella": "205-617-9221"
+    };
+
+    document.getElementById("recipient-name").addEventListener("change", function () {
+      const selectedName = this.value;
+      document.getElementById("recipient-phone").value = recipientPhoneMap[selectedName] || "";
+    });
+
+
     fetch(csvUrl)
       .then(response => response.text())
       .then(data => {
@@ -186,6 +226,8 @@
 
     // Clear on form reset
     document.getElementById("trip-request-form").addEventListener("reset", function () {
+      document.getElementById("recipient-name").value = "";
+      document.getElementById("recipient-phone").value = "";
       document.getElementById("location-address").value = "";
       statInputs.forEach(input => {
         input.disabled = false;
@@ -199,6 +241,8 @@
 
  document.getElementById("preview-btn").addEventListener("click", function () {
     const payload = {
+      recipientName: document.getElementById("recipient-name").value,
+      recipientPhone: document.getElementById("recipient-phone").value,
       location: document.getElementById("location").value,
       address: document.getElementById("location-address").value,
       requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
@@ -213,6 +257,8 @@
     };
 
     const formatted = `
+Recipient Name: ${payload.recipientName}
+Recipient Phone: ${payload.recipientPhone}
 Location: ${payload.location}
 Address: ${payload.address}
 Request Type: ${payload.requestType}
@@ -237,6 +283,8 @@ document.getElementById("trip-request-form").addEventListener("submit", function
   submitBtn.textContent = "Submitting...";
 
   const payload = {
+    recipientName: document.getElementById("recipient-name").value,
+    recipientPhone: document.getElementById("recipient-phone").value,
     location: document.getElementById("location").value,
     address: document.getElementById("location-address").value,
     requestType: document.querySelector('input[name="requestType"]:checked')?.value || "",
@@ -250,7 +298,7 @@ document.getElementById("trip-request-form").addEventListener("submit", function
     tripNotes: document.getElementById("trip-notes").value.trim()
   };
 
-  fetch("https://dispatch.azurewebsites.net/api/sendEmailRequest", {
+  fetch("https://dispatch.azurewebsites.net/api/sendEmailTripRequest?code=c9y3y8XsD7D7rTBDj260c6aK-oDnALvTO8qIjlh8JIKiAzFu2Poycg==", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
