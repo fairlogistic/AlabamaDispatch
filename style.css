@@ -46,11 +46,26 @@ h1 {
 }
 
 label {
-    display: block;
-    margin-top: 20px;
-    font-weight: bold;
-    color: #003366;
+  display: block;
+  margin-top: 12px;      /* Reduce top spacing between sections */
+  margin-bottom: 4px;    /* Tighter spacing above inputs */
+  font-weight: bold;
+  color: #003366;
 }
+
+.flex-row {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.flex-item {
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+}
+
+
 
 /* Unified input styling */
 input[type="text"],
